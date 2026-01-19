@@ -45,12 +45,12 @@ public class NurseController {
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<Boolean> login(@RequestBody Nurse nurse) {
-		boolean exists = nurseRepository.existsByUserAndPass(nurse.getUser(), nurse.getPass());
-		if (exists) {
-			return ResponseEntity.ok(true);
+	public ResponseEntity<Nurse> login(@RequestBody Nurse nurse) {
+		Optional<Nurse> optionalNurse  = nurseRepository.findByUserAndPass(nurse.getUser(), nurse.getPass());
+		if (optionalNurse.isPresent()) {
+			return ResponseEntity.ok(optionalNurse.get());
 		} else {
-			return ResponseEntity.ok(false);
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}
 	}
 
@@ -60,18 +60,14 @@ public class NurseController {
 			Nurse _nurse = nurseRepository.save(
 					new Nurse(nurse.getName(), nurse.getSurname(), nurse.getEmail(), nurse.getUser(), nurse.getPass()));
 			return ResponseEntity.status(HttpStatus.CREATED).body(_nurse);
-
 		} catch (Exception e) {
-
 			return ResponseEntity.badRequest().build();
 		}
 	}
 
 	@GetMapping("/{id}")
 	public ResponseEntity<Nurse> findById(@PathVariable Long id) {
-
 		Optional<Nurse> nurse = nurseRepository.findById(id);
-
 		if (nurse.isPresent()) {
 			return ResponseEntity.ok(nurse.get());
 		} else {

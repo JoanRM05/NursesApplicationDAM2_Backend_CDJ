@@ -106,7 +106,7 @@ class NurseControllerTest {
 
     @Test
     void shouldLoginSuccessfully() throws Exception {
-        Nurse login = new Nurse();
+    	Nurse login = new Nurse();
         login.setUser("luciana");
         login.setPass("1234");
 
@@ -114,20 +114,20 @@ class NurseControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(login)))
                 .andExpect(status().isOk())
-                .andExpect(content().string("true"));
+                .andExpect(jsonPath("$.user").value("luciana"))
+                .andExpect(jsonPath("$.pass").value("1234"));
     }
 
     @Test
     void shouldFailLoginWithInvalidCredentials() throws Exception {
-        Nurse login = new Nurse();
+    	Nurse login = new Nurse();
         login.setUser("luciana");
         login.setPass("wrong");
 
         mockMvc.perform(post("/nurse/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(login)))
-                .andExpect(status().isOk())
-                .andExpect(content().string("false"));
+                .andExpect(status().isUnauthorized());
     }
 
     @Test

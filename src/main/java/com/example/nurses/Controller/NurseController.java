@@ -1,5 +1,7 @@
 package com.example.nurses.Controller;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -7,7 +9,10 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -171,5 +176,29 @@ public class NurseController {
 	    } catch (IOException e) {
 	        throw new RuntimeException("Error al guardar el archivo", e);
 	    }
+	}
+	
+	@GetMapping("/uploads/{imageName}")
+	public ResponseEntity<ByteArrayResource> getImage(@PathVariable String imageName) throws IOException {
+	    File imageFile = new File("uploads/" + imageName);
+
+	    if (!imageFile.exists()) {
+	        return ResponseEntity.notFound().build();
+	    }
+
+	    byte[] imageBytes = Files.readAllBytes(imageFile.toPath());
+	    ByteArrayResource resource = new ByteArrayResource(imageBytes);
+
+	    String contentType = Files.probeContentType(imageFile.toPath());
+
+	    if (contentType == null) {
+	        contentType = "application/octet-stream";
+	    }
+
+	    return ResponseEntity.ok()
+	            .contentType(MediaType.parseMediaType(contentType))
+	            .header(HttpHeaders.CONTENT_DISPOSITION,
+	                    "inline; filename=\"" + imageName + "\"")
+	            .body(resource);
 	}
 }

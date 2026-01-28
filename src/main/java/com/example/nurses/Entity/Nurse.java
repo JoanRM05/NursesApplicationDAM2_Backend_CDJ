@@ -17,6 +17,7 @@ public class Nurse {
 	private String email;
 	private String user;
 	private String pass;
+	private String imageUrl;
 	
 	public Nurse(String name, String surname, String email, String user, String pass) {
 		this.name = name;
@@ -24,6 +25,7 @@ public class Nurse {
 		this.email = email;
 		this.user = user;
 		this.pass = pass;
+		this.imageUrl = "uploads/equipomedico.png";
 	}
 	
 	public Nurse() {
@@ -75,6 +77,14 @@ public class Nurse {
 
 	public void setPass(String pass) {
 		this.pass = pass;
+	}
+
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
 	}
 
 }

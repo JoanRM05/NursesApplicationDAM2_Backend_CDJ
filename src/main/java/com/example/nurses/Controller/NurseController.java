@@ -1,5 +1,9 @@
 package com.example.nurses.Controller;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.example.nurses.Repository.NurseRepository;
 import com.example.nurses.Entity.Nurse;
 
@@ -116,5 +122,54 @@ public class NurseController {
 			return ResponseEntity.notFound().build();
 		}
 	}
+	
+	@PostMapping(
+		    value = "/{id}/upload",
+		    consumes = "multipart/form-data",
+		    produces = "application/json"
+		)
+		public @ResponseBody ResponseEntity<Nurse> uploadFile(
+		        @PathVariable Long id,
+		        @RequestParam("file") MultipartFile file
+		) {
 
+		    Optional<Nurse> optionalNurse = nurseRepository.findById(id);
+
+		    if (!optionalNurse.isPresent()) {
+		        return ResponseEntity.notFound().build();
+		    }
+
+		    try {
+		        String filePath = saveFile(file);
+
+		        Nurse nurse = optionalNurse.get();
+		        nurse.setImageUrl(filePath);
+		        nurseRepository.save(nurse);
+
+		        return ResponseEntity.ok(nurse);
+		    } catch (Exception e) {
+		        return ResponseEntity.badRequest().build();
+		    }
+		}
+
+	private String saveFile(MultipartFile file) {
+	    String folder = "uploads/";
+	    Path path = Paths.get(folder);
+
+	    try {
+	        if (!Files.exists(path)) {
+	            Files.createDirectories(path);
+	        }
+
+	        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+	        Path filePath = path.resolve(fileName);
+
+	        file.transferTo(filePath.toFile());
+
+	        return filePath.toString();
+
+	    } catch (IOException e) {
+	        throw new RuntimeException("Error al guardar el archivo", e);
+	    }
+	}
 }

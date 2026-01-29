@@ -171,7 +171,7 @@ public class NurseController {
 
 	        file.transferTo(filePath.toFile());
 
-	        return filePath.toString();
+	        return fileName;
 
 	    } catch (IOException e) {
 	        throw new RuntimeException("Error al guardar el archivo", e);

@@ -25,7 +25,7 @@ public class Nurse {
 		this.email = email;
 		this.user = user;
 		this.pass = pass;
-		this.imageUrl = "uploads/equipomedico.png";
+		this.imageUrl = "equipomedico.png";
 	}
 	
 	public Nurse() {
